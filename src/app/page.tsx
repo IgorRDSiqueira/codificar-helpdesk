@@ -1,69 +1,226 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Clock3,
+  Plus,
+  Ticket,
+  UserRound,
+} from "lucide-react";
 
-export default function Home() {
+import { listTickets } from "@/services/ticket.service";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+const priorityLabel = {
+  LOW: "Baixa",
+  MEDIUM: "Média",
+  HIGH: "Alta",
+};
+
+const statusLabel = {
+  OPEN: "Aberto",
+  IN_PROGRESS: "Em andamento",
+  RESOLVED: "Resolvido",
+  CLOSED: "Fechado",
+};
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
+}
+
+export default async function TicketsPage() {
+  const tickets = await listTickets();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="min-h-screen bg-muted/30">
+      <header className="border-b bg-background">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div>
+            <Link
+              href="/"
+              className="text-xl font-bold transition-opacity hover:opacity-70"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              HelpDesk
+            </Link>
+
+            <p className="text-sm text-muted-foreground">
+              Gestão de chamados internos
+            </p>
+          </div>
+
+          <Button
+            render={
+              <Link href="/chamados/novo">
+                <Plus />
+                Novo chamado
+              </Link>
+            }
+          />
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Link
+              href="/"
+              className="mb-3 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              <ArrowLeft className="h-4 w-4" />
+              Voltar para visão geral
+            </Link>
+
+            <h1 className="text-3xl font-bold tracking-tight">
+              Chamados
+            </h1>
+
+            <p className="mt-1 text-muted-foreground">
+              Acompanhe todas as solicitações registradas.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 rounded-lg border bg-background px-4 py-2 text-sm">
+            <Ticket className="h-4 w-4 text-muted-foreground" />
+
+            <span className="text-muted-foreground">
+              Total:
+            </span>
+
+            <strong>{tickets.length}</strong>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Lista de chamados</CardTitle>
+
+            <p className="text-sm text-muted-foreground">
+              Visualize prioridade, status, responsável e data de abertura.
+            </p>
+          </CardHeader>
+
+          <CardContent>
+            {tickets.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="mb-4 rounded-full bg-muted p-4">
+                  <Ticket className="h-6 w-6 text-muted-foreground" />
+                </div>
+
+                <h2 className="font-semibold">
+                  Nenhum chamado encontrado
+                </h2>
+
+                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                  Quando uma solicitação for registrada, ela aparecerá
+                  nesta página.
+                </p>
+
+                <Button
+                  className="mt-5"
+                  render={
+                    <Link href="/chamados/novo">
+                      <Plus />
+                      Criar primeiro chamado
+                    </Link>
+                  }
+                />
+              </div>
+            ) : (
+              <div className="overflow-hidden rounded-lg border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Chamado</TableHead>
+                      <TableHead>Prioridade</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Responsável</TableHead>
+                      <TableHead>Aberto em</TableHead>
+                      <TableHead className="text-right">
+                        Ação
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+
+                  <TableBody>
+                    {tickets.map((ticket) => (
+                      <TableRow key={ticket.id}>
+                        <TableCell>
+                          <div className="max-w-md">
+                            <p className="font-medium">
+                              {ticket.title}
+                            </p>
+
+                            <p className="mt-1 truncate text-sm text-muted-foreground">
+                              {ticket.description}
+                            </p>
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <Badge variant="outline">
+                            {priorityLabel[ticket.priority]}
+                          </Badge>
+                        </TableCell>
+
+                        <TableCell>
+                          <Badge>
+                            {statusLabel[ticket.status]}
+                          </Badge>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <UserRound className="h-4 w-4 text-muted-foreground" />
+                            {ticket.assignee.name}
+                          </div>
+                        </TableCell>
+
+                        <TableCell>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock3 className="h-4 w-4" />
+                            {formatDate(ticket.createdAt)}
+                          </div>
+                        </TableCell>
+
+                        <TableCell className="text-right">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            render={
+                              <Link
+                                href={`/chamados/${ticket.id}`}
+                              >
+                                Visualizar
+                              </Link>
+                            }
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }

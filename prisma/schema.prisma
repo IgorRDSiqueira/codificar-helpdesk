@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Assignee {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tickets Ticket[]
+
+  @@map("assignees")
+}
+
+model Ticket {
+  id            String       @id @default(cuid())
+  title         String
+  description   String
+  requesterName String       @default("Não informado")
+  priority      Priority     @default(MEDIUM)
+  status        TicketStatus @default(OPEN)
+
+  assigneeId String
+  assignee   Assignee @relation(fields: [assigneeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([assigneeId])
+  @@index([priority])
+  @@map("tickets")
+}
